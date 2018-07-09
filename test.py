@@ -5,7 +5,23 @@ import re
 import sys
 import struct
 import socket
+import urllib
+import time
+from subprocess import Popen, PIPE
+import json as m_json
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+try:
+    import urllib.request #Python3.x
+except ImportError:
+    import urllib2 #Python2.x
+#End of import#
 
+def q():
+    print(''' You are a horrible ''')
+    exit()
 
 #initial ping
 #for the hostname
@@ -22,34 +38,35 @@ def ping ():
 def Cloudflare():
      print('Not ready yet')
      mainMenu()
-def traceroute():
-    print '''Usage: %s host port
-    Tries to connect to host at TCP port with increasing TTL (Time to live).
-    If /etc/services exists (on most Unix systems), you can give the protocol
-    name for the port. Example 'ssh' instead of 22.
-    ''' % os.path.basename(sys.argv[0])
-    print 'run as root!'
-    val = str3 = raw_input("\nBegin tracert? Y/N:")
-    if val is 'Y':
-        tracert();
-    elif val is 'Yes':
-        tracert();
-    elif val is 'yes':
-        tracert();
-    elif val is 'No':
-        mainMenu();
-    elif val is 'no':
-        mainMenu();
-    elif val is 'N':
-        mainMenu();
-    else:
-        print('That is not a valid option.')
-        traceroute();
+
+def traceroute(url,*arg):
+    print('''This function uses ICMP to trace a host and give an IP.
+    Please run as root and don't include HTTPS in url. ''')
+    url = raw_input("\nPlease type in url to traceroute a website: ");
+    while True:
+        if 'http' not in url:
+            url = "http://" + url
+        elif "www" not in url:
+            url = "www."[:7] + url[7:]
+        else:
+            url = url
+            break
+    url = urlparse(url)
+    url = url.netloc
+    print(url)
+    p = Popen(['tracert', url], stdout=PIPE)
+    while True:
+        line = p.stdout.readline()
+        line2 = str(line).replace('\\r','').replace('\\n','')
+        if len(arg)>0:
+            file = open(arg[0], "a")
+            file.write(line2)
+            file.close()
+        print(line2)
+        if not line:
+            break
 
 
-def q():
-    print(''' You are a horrible ''')
-    exit()
 
 def mainMenu():
         print (''' 
@@ -61,9 +78,9 @@ def mainMenu():
     $$$$$$$  |$$ |   __ $$$$$$$/  
     $$ |  $$ |$$ \__/  |$$ |      
     $$ |  $$ |$$    $$/ $$ |      
-    $$/   $$/  $$$$$$/  $$/       
+    $$/   $$/  $$$$$$/  $$/  net   
 
-    https://sourceforge.net/projects/foxnukepy/
+    https://sourceforge.net/projects/rcpnet/
     https://twitter.com/PotatoSkins16
     Choose one
                               ''')
@@ -88,3 +105,4 @@ def mainMenu():
 
 
 mainMenu()
+
